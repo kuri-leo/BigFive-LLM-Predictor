@@ -2,22 +2,57 @@
 
 This repository contains the code and instructions for the paper ["Predicting the Big Five Personality Traits in Chinese Counselling Dialogues Using Large Language Models"](https://arxiv.org/abs/2406.17287).
 
+## Research Overview
+
+Our research investigates whether LLMs can reason about personality traits from conversational text. The starting point is the BigFive prediction framework ([Yan et al., 2024](https://arxiv.org/abs/2406.17287)), which applies role-play and questionnaire-based prompting to predict Big Five traits from real-world counselling sessions.
+
+During the early baseline experiments, we observed some interesting reasoning failures and traced them to two different bottlenecks:
+
+1. **The Knowledge Dimension ("Knowing That").** Does the LLM encode sufficient domain knowledge but fail to recall it during multi-step reasoning? This investigation led to the knowledge-deconstruction mechanism in **SocraticAgent** (AAMAS 2026).
+
+2. **The Method Dimension ("Knowing How").** Does the LLM generalize abstract computational rules, or rely on surface pattern matching? This led to our parallel work, **"Do Large Language Models Truly Grasp Addition?"** (EMNLP 2025).
+
+In turn, insights from these two studies fed back into the applied psych-assessment setting:
+
+3. **Calibration.** The knowledge-synthesis idea behind SocraticAgent was adapted to calibrate chain-of-thought reasoning in psych-assessment agents, producing **"Chain-of-Thought Calibration via Collaborative Knowledge Synthesis for Psych-Assessment Agents"** (CSCWD 2026).
+
+4. **Questionnaire Design.** We also stepped back to question the assessment instrument itself — can LLMs collaborate with domain experts to design better psychological questionnaires? This led to **PsyScale** (CSCWD 2026).
+
+## Publications
+
+| Paper | Venue | Code |
+|:------|:------|:-----|
+| Predicting the Big Five Personality Traits in Chinese Counselling Dialogues Using Large Language Models | arXiv 2024 | this repo |
+| SocraticAgent: An Autonomous Agent for Unlocking Latent Knowledge in LLMs | AAMAS 2026 | [kuri-leo/SocraticAgent](https://github.com/kuri-leo/SocraticAgent) |
+| Do Large Language Models Truly Grasp Addition? A Rule-Focused Diagnostic Using Two-Integer Arithmetic | EMNLP 2025 | [kuri-leo/llm-arithmetic-diagnostic](https://github.com/kuri-leo/llm-arithmetic-diagnostic) |
+| Chain-of-Thought Calibration via Collaborative Knowledge Synthesis for Psych-Assessment Agents | CSCWD 2026 | — |
+| PsyScale: A Collaborative Human-AI Framework for Theory-Driven Psych Questionnaire Design | CSCWD 2026 | — |
+
 ## News
 
-- [2024/08/28] We uploaded a new fine-tuned checkpoint [`Gemma-2-2b-it-BFI-Anonymous`](https://huggingface.co/kurileo/Gemma-2-2b-it-BFI-Anonymous) based on `Google/gemma-2-2b-it`, which outperforms `Qwen1.5-110B-Chat` by 18.82% in the average correlation of the Big Five personality traits with only 1.8% of the parameters.
+- [2026/02] Two papers accepted at CSCWD 2026: "Chain-of-Thought Calibration via Collaborative Knowledge Synthesis for Psych-Assessment Agents" and "PsyScale: A Collaborative Human-AI Framework for Theory-Driven Psych Questionnaire Design".
+- [2025/12] "SocraticAgent: An Autonomous Agent for Unlocking Latent Knowledge in LLMs" accepted at AAMAS 2026.
+- [2025/09] "Do Large Language Models Truly Grasp Addition? A Rule-Focused Diagnostic Using Two-Integer Arithmetic" accepted at EMNLP 2025.
+- [2024/08] Released fine-tuned checkpoint [`Gemma-2-2b-it-BFI-Anonymous`](https://huggingface.co/kurileo/Gemma-2-2b-it-BFI-Anonymous), outperforming `Qwen1.5-110B-Chat` by 18.82% with only 1.8% of the parameters.
 
-## Abstract
+---
 
-Accurate assessment of personality traits is crucial for effective psycho-counseling, yet traditional methods like self-report questionnaires are time-consuming and biased. This study examines whether Large Language Models (LLMs) can predict the Big Five personality traits directly from counseling dialogues and introduces an innovative framework to perform the task. Our framework applies role-play and questionnaire-based prompting to condition LLMs on counseling sessions, simulating client responses to the Big Five Inventory. We evaluated our framework on 853 real-world counseling sessions, finding a significant correlation between LLM-predicted and actual Big Five traits, proving the framework's validity. Moreover, ablation studies highlight the importance of role-play simulations and task simplification via questionnaires in enhancing prediction accuracy. Our fine-tuned Llama3-8B model, utilizing Direct Preference Optimization with Supervised Fine-Tuning, achieves a 130.95% improvement, surpassing the state-of-the-art Qwen1.5-110B by 36.94% in personality prediction validity. In conclusion, LLMs can predict personality based on counseling dialogues. Our code and model are publicly available at [GitHub](https://github.com/Anonymous-gwFabfaH/BigFive-LLM-Predictor), providing a valuable tool for future research in computational psychometrics.
+## BigFive-LLM-Predictor
 
-## File Structure
+Paper: [Predicting the Big Five Personality Traits in Chinese Counselling Dialogues Using Large Language Models](https://arxiv.org/abs/2406.17287)
+
+### Abstract
+
+Accurate assessment of personality traits is crucial for effective psycho-counseling, yet traditional methods like self-report questionnaires are time-consuming and biased. This study examines whether Large Language Models (LLMs) can predict the Big Five personality traits directly from counseling dialogues and introduces an innovative framework to perform the task. Our framework applies role-play and questionnaire-based prompting to condition LLMs on counseling sessions, simulating client responses to the Big Five Inventory. We evaluated our framework on 853 real-world counseling sessions, finding a significant correlation between LLM-predicted and actual Big Five traits, proving the framework's validity. Moreover, ablation studies highlight the importance of role-play simulations and task simplification via questionnaires in enhancing prediction accuracy. Our fine-tuned Llama3-8B model, utilizing Direct Preference Optimization with Supervised Fine-Tuning, achieves a 130.95% improvement, surpassing the state-of-the-art Qwen1.5-110B by 36.94% in personality prediction validity. In conclusion, LLMs can predict personality based on counseling dialogues. Our code and model are publicly available at [GitHub](https://github.com/kuri-leo/BigFive-LLM-Predictor), providing a valuable tool for future research in computational psychometrics.
+
+### File Structure
 
 - `generate_bfi_requests.py` - Generates Big Five Inventory (BFI) requests for the counseling dialogues following our role-play and questionnaire-based prompting framework.
 - `process_results.py` - Processes the results of the LLM predictions and calculates the OCEAN scores.
 
 _Note: The generated requests can be processed with [api_request_parallel_processor.py](https://github.com/openai/openai-cookbook/blob/main/examples/api_request_parallel_processor.py) from the OpenAI Cookbook._
 
-## Data Schema
+### Data Schema
 
 Each counseling dialogue session is stored in a separate TXT file. Each utterance has a prefix indicating the speaker, either "咨询师" (Counselor) or "来访者" (Client). The dialogues are in Chinese.
 
@@ -27,7 +62,7 @@ Each file is named using the format `{Client_ID}_chat_{Chatround_ID}_{Timestamp}
 - `Chatround_ID` is the number of chat rounds in the counseling session.
 - `Timestamp` is the timestamp of the counseling session.
 
-## Model Checkpoints
+### Model Checkpoints
 
 Currently, we provide the following model checkpoints:
 
@@ -38,7 +73,7 @@ Currently, we provide the following model checkpoints:
 
 For each model, you can use `transformers` from Hugging Face or serving tools like [`vLLM`](https://github.com/vllm-project/vllm) or [`sglang`](https://github.com/sgl-project/sglang) for inference or hosting.
 
-### Benchmark Results
+#### Benchmark Results
 
 | Model                       | Open Mindedness | Conscientiousness | Extraversion | Agreeableness | Negative Emotionality |  Avg. |
 | :-------------------------- | :-------------- | :---------------- | :----------- | :------------ | :-------------------- | ----: |
@@ -52,17 +87,17 @@ For each model, you can use `transformers` from Hugging Face or serving tools li
 
 For full benchmark results, please refer to the paper.
 
-## Getting Started
+### Getting Started
 
 To get started, clone the repository and install the necessary dependencies:
 
 ```bash
-git clone https://github.com/Anonymous-gwFabfaH/BigFive-LLM-Predictor.git
+git clone https://github.com/kuri-leo/BigFive-LLM-Predictor.git
 cd BigFive-LLM-Predictor
 pip install -r requirements.txt
 ```
 
-### Generating BFI Requests
+#### Generating BFI Requests
 
 To generate the Big Five Inventory requests for your counseling dialogues, run:
 
@@ -70,7 +105,7 @@ To generate the Big Five Inventory requests for your counseling dialogues, run:
 python generate_bfi_requests.py --model_name MODEL_NAME --source_path path_to_your_dialogues --output_path path_to_output_requests
 ```
 
-### Processing Results
+#### Processing Results
 
 To process the results of the LLM predictions and calculate the OCEAN scores, run:
 
@@ -82,17 +117,44 @@ Note: modify the `process_results.py` script to load the LLM predictions and def
 
 ## Citation
 
-If you find this work useful for your research, please consider citing the paper:
+If you find this work useful for your research, please consider citing the papers:
 
 ```bibtex
-@misc{yan2024predictingbigpersonalitytraits,
-      title={Predicting the Big Five Personality Traits in Chinese Counselling Dialogues Using Large Language Models},
-      author={Yang Yan and Lizhi Ma and Anqi Li and Jingsong Ma and Zhenzhong Lan},
-      year={2024},
-      eprint={2406.17287},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
-      url={https://arxiv.org/abs/2406.17287},
+@article{yan2024predicting,
+  title={Predicting the Big Five Personality Traits in Chinese Counselling Dialogues Using Large Language Models},
+  author={Yan, Yang and Ma, Lizhi and Li, Anqi and Ma, Jingsong and Lan, Zhenzhong},
+  journal={arXiv preprint arXiv:2406.17287},
+  year={2024}
+}
+
+@inproceedings{yan2026socraticagent,
+  title={SocraticAgent: An Autonomous Agent for Unlocking Latent Knowledge in LLMs},
+  author={Yan, Yang and Lu, Yu and Xu, Renjun and Lan, Zhenzhong},
+  booktitle={Proc. of the 25th International Conference on Autonomous Agents and Multiagent Systems},
+  pages={1977--1985},
+  year={2026}
+}
+
+@inproceedings{yan2025large,
+  title={Do Large Language Models Truly Grasp Addition? A Rule-Focused Diagnostic Using Two-Integer Arithmetic},
+  author={Yan, Yang and Lu, Yu and Xu, Renjun and Lan, Zhenzhong},
+  booktitle={Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing},
+  pages={13478--13494},
+  year={2025}
+}
+
+@inproceedings{yan2026chain,
+  title={Chain-of-Thought Calibration via Collaborative Knowledge Synthesis for Psych-Assessment Agents},
+  author={Yan, Yang and Ma, Lizhi and Lu, Yu and Xu, Renjun and Lan, Zhenzhong},
+  booktitle={Proceedings of the 2026 29th International Conference on Computer Supported Cooperative Work in Design (CSCWD)},
+  year={2026}
+}
+
+@inproceedings{yan2026psyscale,
+  title={PsyScale: A Collaborative Human-AI Framework for Theory-Driven Psych Questionnaire Design},
+  author={Yan, Yang and Ma, Lizhi and Lu, Yu and Xu, Renjun and Lan, Zhenzhong},
+  booktitle={Proceedings of the 2026 29th International Conference on Computer Supported Cooperative Work in Design (CSCWD)},
+  year={2026}
 }
 ```
 
